@@ -4,7 +4,7 @@ from bs4 import BeautifulSoup
 
 def fetch_ip_info(ip_address):
     """
-    Fetches information about a given IP address using an online API.
+    Fetches information about the given IP address from an online API.
     
     Args:
         ip_address (str): The IP address to look up.
@@ -13,42 +13,40 @@ def fetch_ip_info(ip_address):
         dict: A dictionary containing information about the IP address.
     """
     try:
-        # API endpoint for IP information
-        api_url = f'https://ipinfo.io/{ip_address}/json'
-        response = requests.get(api_url)
+        # URL to fetch IP information
+        url = f"https://ipinfo.io/{ip_address}/json"
+        response = requests.get(url)
         
-        # Raise an error if the response is not successful
+        # Raise an error if the request was unsuccessful
         response.raise_for_status()
         
-        # Return the JSON response as a dictionary
         return response.json()
     except requests.RequestException as e:
-        print(f"Error fetching IP information: {e}")
-        return {}
+        print(f"Error fetching data for {ip_address}: {e}")
+        return None
 
 def display_ip_info(ip_info):
     """
-    Displays the IP address information in a readable format.
-
+    Displays the IP information in a readable format.
+    
     Args:
-        ip_info (dict): The dictionary containing IP information.
+        ip_info (dict): The IP information to display.
     """
     if ip_info:
         print("IP Information:")
         for key, value in ip_info.items():
             print(f"{key.capitalize()}: {value}")
     else:
-        print("No information available for this IP address.")
+        print("No information available.")
 
 def main():
-    """
-    Main function to execute the script.
-    """
-    # Get user input for the IP address
-    ip_address = input("Enter an IP address to look up: ")
+    # Example IP address to investigate
+    ip_address = input("Enter an IP address to investigate: ")
     
-    # Fetch and display the IP information
+    # Fetching the IP information
     ip_info = fetch_ip_info(ip_address)
+    
+    # Displaying the fetched information
     display_ip_info(ip_info)
 
 if __name__ == "__main__":
