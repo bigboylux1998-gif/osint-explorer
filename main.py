@@ -1,53 +1,56 @@
 ```python
 import requests
 from bs4 import BeautifulSoup
+import csv
 
 def fetch_ip_info(ip_address):
     """
-    Fetches information about the given IP address from an online API.
+    Fetches information about a given IP address from an online API.
     
     Args:
-        ip_address (str): The IP address to look up.
-
+    ip_address (str): The IP address to lookup.
+    
     Returns:
-        dict: A dictionary containing information about the IP address.
+    dict: A dictionary containing IP information.
     """
-    try:
-        # URL to fetch IP information
-        url = f"https://ipinfo.io/{ip_address}/json"
-        response = requests.get(url)
-        
-        # Raise an error if the request was unsuccessful
-        response.raise_for_status()
-        
+    url = f'https://ipinfo.io/{ip_address}/json'
+    response = requests.get(url)
+    
+    if response.status_code == 200:
         return response.json()
-    except requests.RequestException as e:
-        print(f"Error fetching data for {ip_address}: {e}")
+    else:
+        print(f"Failed to fetch data for IP: {ip_address}")
         return None
 
-def display_ip_info(ip_info):
+def save_to_csv(data, filename='ip_info.csv'):
     """
-    Displays the IP information in a readable format.
+    Saves the fetched IP information to a CSV file.
     
     Args:
-        ip_info (dict): The IP information to display.
+    data (list): A list of dictionaries containing IP information.
+    filename (str): The name of the CSV file to save data.
     """
-    if ip_info:
-        print("IP Information:")
-        for key, value in ip_info.items():
-            print(f"{key.capitalize()}: {value}")
-    else:
-        print("No information available.")
+    keys = data[0].keys()
+    with open(filename, 'w', newline='') as output_file:
+        dict_writer = csv.DictWriter(output_file, fieldnames=keys)
+        dict_writer.writeheader()
+        dict_writer.writerows(data)
 
 def main():
-    # Example IP address to investigate
-    ip_address = input("Enter an IP address to investigate: ")
+    """
+    Main function to execute the OSINT project.
+    """
+    ip_addresses = ['8.8.8.8', '1.1.1.1', '192.168.1.1']  # Example IP addresses
+    ip_info_list = []
     
-    # Fetching the IP information
-    ip_info = fetch_ip_info(ip_address)
-    
-    # Displaying the fetched information
-    display_ip_info(ip_info)
+    for ip in ip_addresses:
+        ip_info = fetch_ip_info(ip)
+        if ip_info:
+            ip_info_list.append(ip_info)
+
+    if ip_info_list:
+        save_to_csv(ip_info_list)
+        print(f"IP information saved to 'ip_info.csv'.")
 
 if __name__ == "__main__":
     main()
